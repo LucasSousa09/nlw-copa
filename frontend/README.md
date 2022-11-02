@@ -1,0 +1,1 @@
+## NLW Copa - Vem Jogar com a Gente! 
