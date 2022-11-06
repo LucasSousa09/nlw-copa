@@ -1,3 +1,5 @@
+import { useSpring, animated} from 'react-spring'
+
 import { FormEvent, useState } from "react"
 import { GetServerSideProps } from "next"
 
@@ -15,8 +17,13 @@ interface HomeProps {
   guessesCount: number
 }
 
+const calc = (x:number, y:number) => [-(y - window.innerHeight / 2) / 20, (x - window.innerWidth / 2) / 20, 1.1]
+const trans = (x:number, y:number, s:number) => `perspective(600px) rotateX(${x}deg) rotateY(${y}deg) scale(${s})`
+
 export default function Home({poolsCount, usersCount, guessesCount}: HomeProps) {
   const [ poolTitle, setPoolTitle ] = useState('')
+
+  const [props, setProps ] = useSpring(() => ({xys: [0, 0, 1], config: {mass: 10, tension:300, friction:50}}))
 
   async function handleSubmit(evt: FormEvent){
     evt.preventDefault()
@@ -83,14 +90,21 @@ export default function Home({poolsCount, usersCount, guessesCount}: HomeProps) 
         </div>
      </main>
 
-     <div className="flex flex-1 justify-center items-center">
+     <animated.div 
+      className="flex flex-1 justify-center items-center"
+      onMouseMove={({clientX: x, clientY: y}) => (setProps({xys: calc(x, y)}))}
+      onMouseLeave={() => setProps({xys: [0,0,1]})}
+      style={{
+        transform: props.xys.to(trans)
+      }}
+    >
       <Image 
         src={smartphonesImage} 
         alt="Dois celulares mostrnado a prévia da versão mobile do NLW Copa" 
         quality={100}
         className="max-w-lg"
       />
-     </div>
+     </animated.div>
     </div>
   )
 }
